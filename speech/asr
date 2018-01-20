@@ -1,0 +1,12 @@
+#!/bin/bash
+FILE=$1
+MIME="$([[ "$(echo $2)" ]] && echo $2 || echo 'audio/ogg;codecs=opus')"
+uuid=01ae13cb744628b58fb536d496faa1e7 # $(cat /proc/sys/kernel/random/uuid | sed 's/-//g')
+# audio/x-wav audio/ogg;codecs=opus
+xml="$(curl -X POST \
+	-H "Content-Type: $MIME" \
+	--data-binary "@$FILE" \
+	"https://asr.yandex.net/asr_xml?uuid=$uuid&topic=queries&lang=ru-ru&key=f546808c-05c8-4ef3-b4a8-636e40654e53" \
+	2>/dev/null)"
+echo "$xml" >&2
+echo "$xml" | ~/services/speech/asr.py

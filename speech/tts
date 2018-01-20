@@ -1,0 +1,15 @@
+#!/bin/bash
+t=$(echo -e "$1" | xargs)
+[[ "$t" ]] || t="$(cat -)"
+TEXT=$(node -p "encodeURIComponent('$t')")
+curl "https://tts.voicetech.yandex.net/generate?text=$TEXT&speed=1.1&format=mp3&lang=ru-RU&speaker=ermil&key=57f9c9a5-cb14-46df-b0c6-72af7fadf6b3&emotion=good" 2>/dev/null |\
+	(
+		has=$(has-music)
+		[[ "$has" ]] && (pause-music;sleep 1)
+		v=$(get-vol)
+		[ "$(date +%H)" -ge 11 ] && vol 100 # after 11:00 should tmp set max vol
+		echo $(get-vol)
+		mplayer -
+		vol $v
+		[[ "$has" ]] && (sleep 1;resume-music)
+	) || :
